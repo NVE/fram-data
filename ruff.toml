@@ -1,0 +1,17 @@
+# For full list of configuration elements see documentation at https://docs.astral.sh/ruff/editors/settings.
+
+line-length = 160
+
+[format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
+
+# For full list of available rules check documentation at https://docs.astral.sh/ruff/rules/.
+[lint]
+select = ["A", "ANN", "ASYNC", "B", "C90", "COM", "D", "E", "EM", "F", "FIX", "G", "I", "INP", "ISC", "N", "PD", "PLC", "PLE", "PLR", "PLW", "PT", "PTH", "Q", "RET", "RSE", "RUF", "SIM", "SLF", "UP", "W"]
+ignore = ["B007", "N999", "D203", "D212", "D104", "INP001"]
+
+[lint.per-file-ignores]
+"tests/**.py" = ["ANN201", "D10", "PLR2004", "ANN001", "ANN202", "ANN204", "SLF001"]
+"**/__init__.py" = ["I001"]

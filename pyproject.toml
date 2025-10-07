@@ -1,0 +1,46 @@
+[project]
+name = "framdata"
+version = "0.1.0a1"
+description = ""
+authors = [
+    {name = "The Norwegian Water Resources and Energy Directorate", email = "fram@nve.no"}
+]
+license = "LICENSE.md"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "framcore (>=0.1.0a1)",
+    "pandas (>=2.2.3)",
+    "pyarrow",
+    "openpyxl",
+    "pandera (>=0.23.1,<0.24.0)",
+    "pyyaml (>=6.0.2,<7.0.0)",
+    "h5py (>=3.14.0,<4.0.0)"
+]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+packages = [{include = "framdata"}]
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.3.5"
+
+[tool.poetry.group.check]
+optional = true
+
+[tool.poetry.group.check.dependencies]
+ruff = "^0.9.9"
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+mkdocs = "^1.6.1"
+mkdocstrings-python = "^1.18.2"
+mkdocs-material = "^9.6.18"
+mike = "^2.1.3"
+mkdocs-macros-plugin = "^1.3.9"
+mkdocs-table-reader-plugin = "^3.1.0"
