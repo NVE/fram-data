@@ -38,7 +38,7 @@ jobs:
       - name: Install Dependencies
         run: |
           echo "Installing dependencies for ${{ inputs.package_name }}"
-          poetry install --only docs
+          poetry install --no-root --only docs
 
       - name: Verify package structure
         run: |
