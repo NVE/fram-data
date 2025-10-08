@@ -1,5 +1,5 @@
 [project]
-name = "framdata"
+name = "fram-data"
 version = "0.1.0a1"
 description = ""
 authors = [
@@ -9,7 +9,7 @@ license = "LICENSE.md"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "framcore (>=0.1.0a1)",
+    "fram-core (>=0.1.0a1)",
     "pandas (>=2.2.3)",
     "pyarrow",
     "openpyxl",
