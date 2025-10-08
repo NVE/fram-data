@@ -1,0 +1,54 @@
+name: Publish framdata to PyPI
+
+on: 
+#  push:
+#    branches:
+#      - main
+#    paths:
+#      - 'framdata/**'
+#      - 'pyproject.toml'
+#      - 'README.md'
+  workflow_dispatch:
+#  release:
+#    types: [published]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build:
+    uses: ./.github/workflows/template_publish_to_pypi.yml
+    with:
+      package_name: 'framdata'
+
+  # This step can not be defined in the template as pypa/gh-action-pypi-publish does not support it being run in a reusable workflow
+  publish-to-pypi:
+    name: Publish ${{ inputs.package_name }} to PyPI
+    needs:
+      - build
+    runs-on: ubuntu-latest
+
+    environment:
+      name: fram-pypi
+      url: https://pypi.org/p/${{ inputs.package_name }}
+
+    permissions:
+      id-token: write
+
+    steps:
+    - name: Download all the dists
+      uses: actions/download-artifact@v4
+      with:
+        name: framdata-dist
+        path: dist/
+    
+    - name: Verify downloaded packages
+      run: |
+        echo "Downloaded packages for ${{ inputs.package_name }}:"
+        ls -la dist/
+    
+    - name: Publish distribution 📦 to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+#      with:
+#        repository-url: https://test.pypi.org/legacy/
