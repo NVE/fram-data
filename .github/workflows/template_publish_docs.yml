@@ -28,17 +28,22 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: latest
-          virtualenvs-create: true
-          virtualenvs-in-project: true
+#      - name: Install Poetry
+#        uses: snok/install-poetry@v1
+#        with:
+#          version: latest
+#          virtualenvs-create: true
+#          virtualenvs-in-project: true
 
-      - name: Install Dependencies
+#      - name: Install Dependencies
+#        run: |
+#          echo "Installing dependencies for ${{ inputs.package_name }}"
+#          poetry install --no-root --only docs
+
+      - name: Install mkdocs dependencies
         run: |
-          echo "Installing dependencies for ${{ inputs.package_name }}"
-          poetry install --no-root --only docs
+          echo "Installing mkdocs dependencies.."
+          pip install mkdocs, mkdocstrings-python, mkdocs-material, mike, mkdocs-macros-plugin, mkdocs-table-reader-plugin
 
       - name: Verify package structure
         run: |
@@ -60,7 +65,7 @@ jobs:
           VERSION=$(poetry version --short)
           echo "Deploying documentation for ${{ inputs.package_name }} version: $VERSION"
 
-          poetry run mike deploy --push --update-aliases $VERSION latest
-          poetry run mike set-default latest --push
+          mike deploy --push --update-aliases $VERSION latest
+          mike set-default latest --push
           
           echo "Documentation for ${{ inputs.package_name }} deployed successfully!"
