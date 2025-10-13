@@ -35,15 +35,15 @@ jobs:
           virtualenvs-create: true
           virtualenvs-in-project: true
 
-#      - name: Install Dependencies
-#        run: |
-#          echo "Installing dependencies for ${{ inputs.package_name }}"
-#          poetry install --no-root --only docs
-
-      - name: Install mkdocs dependencies
+      - name: Install Dependencies
         run: |
-          echo "Installing mkdocs dependencies.."
-          pip install mkdocs mkdocstrings-python mkdocs-material mike mkdocs-macros-plugin mkdocs-table-reader-plugin
+          echo "Installing dependencies for ${{ inputs.package_name }}"
+          poetry install --no-root --only docs
+
+#      - name: Install mkdocs dependencies
+#        run: |
+#          echo "Installing mkdocs dependencies.."
+#          pip install mkdocs mkdocstrings-python mkdocs-material mike mkdocs-macros-plugin mkdocs-table-reader-plugin
 
       - name: Verify package structure
         run: |
