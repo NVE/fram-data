@@ -518,19 +518,12 @@ class NVEYamlTimeVectoroader(NVETimeVectorLoader):
         if len(datetime_list) == 0:
             message = f"Index of {vector_id} in {self} contains no points."
             raise ValueError(message)
-        if len(datetime_list) == 1:
-            if not meta[TvMn.IS_ZERO_ONE_PROFILE]:
-                message = (
-                    f"Index of {vector_id} in {self} contains a single point but is classified as an average index with a reference period."
-                    " Can only create an extrapolatable index when it does not have a reference period."
-                )
-                raise ValueError(message)
-            # if not (meta[TvMn.EXTRAPOLATE_FISRT_POINT] and meta[TvMn.EXTRAPOLATE_LAST_POINT]):
-            #     message = (
-            #         f"Index of {vector_id} in {self} contains a single point but is classified as not extrapolatable."
-            #         " Can only create an extrapolatable index when it is both forward and backwards extrapolatable."
-            #     )
-            #     raise ValueError(message)
+
+        if (len(datetime_list) == 1 or self.get_values(vector_id).size == 1) and meta[TvMn.EXTRAPOLATE_FISRT_POINT] and meta[TvMn.EXTRAPOLATE_LAST_POINT]:
+            # Even though _create_index can now handle ConstantTimeIndexes,
+            # we need to consider that YAML time vectors can have the extra end date for its final period stored in its index.
+            # That would lead to _create_time_index not creating a constant one when it should.
+            # We may remove this feature in the future.
             return ConstantTimeIndex()
 
         args = (
@@ -541,19 +534,9 @@ class NVEYamlTimeVectoroader(NVETimeVectorLoader):
         )
 
         if len(datetime_list) == len(self.get_values(vector_id)) + 1:
-            return ListTimeIndex(
-                datetime_list=datetime_list,
-                is_52_week_years=meta[TvMn.IS_52_WEEK_YEARS],
-                extrapolate_first_point=meta[TvMn.EXTRAPOLATE_FISRT_POINT],
-                extrapolate_last_point=meta[TvMn.EXTRAPOLATE_LAST_POINT],
-            )
+            return ListTimeIndex(*args)
         # create index with added end datetime
-        return self._create_index(
-            datetimes=datetime_list,
-            is_52_week_years=meta[TvMn.IS_52_WEEK_YEARS],
-            extrapolate_first_point=meta[TvMn.EXTRAPOLATE_FISRT_POINT],
-            extrapolate_last_point=meta[TvMn.EXTRAPOLATE_LAST_POINT],
-        )
+        return self._create_index(*args)
 
     def get_metadata(self, vector_id: str) -> dict[str, bool | int | str | datetime | timedelta | tzinfo | None]:
         """

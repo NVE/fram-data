@@ -11,7 +11,7 @@ from typing import Any
 
 import numpy as np
 from framcore.loaders import FileLoader, TimeVectorLoader
-from framcore.timeindexes import FixedFrequencyTimeIndex, ListTimeIndex
+from framcore.timeindexes import ConstantTimeIndex, FixedFrequencyTimeIndex, ListTimeIndex, SinglePeriodTimeIndex
 from framcore.timevectors import ReferencePeriod
 from numpy.typing import NDArray
 
@@ -194,12 +194,15 @@ class NVETimeVectorLoader(FileLoader, TimeVectorLoader):
         """
         dt64_arrray = np.array(datetimes).astype("datetime64[us]")  # convert to microseconds to match resolution of python tatetime
 
-        diff_array = np.diff(dt64_arrray)
-        diff_array_2 = np.diff(diff_array)
-        s = diff_array_2.sum()
-        if s == np.timedelta64(0):
+        if dt64_arrray.size == 1 and extrapolate_first_point and extrapolate_last_point:
+            return ConstantTimeIndex()
+
+        diff_array = np.diff(dt64_arrray)  # get period durations between points
+        unique_array = np.unique(diff_array)  # get unique durations
+
+        if unique_array.size == 1 and dt64_arrray.size > 1:  # Fixed frequency and more than one value
             dt64_start: np.datetime64 = dt64_arrray[0]
-            td64_period_duration: np.timedelta64 = diff_array[0]
+            td64_period_duration: np.timedelta64 = unique_array[0]
             return FixedFrequencyTimeIndex(
                 start_time=dt64_start.item(),
                 period_duration=td64_period_duration.item(),
@@ -212,9 +215,21 @@ class NVETimeVectorLoader(FileLoader, TimeVectorLoader):
         # add end date to final period
         dt_list = datetimes if isinstance(datetimes, list) else datetimes.astype("datetime64[us]").astype(datetime).tolist()
         end_year = dt_list[-1].isocalendar().year + 1
-        end_date = datetime.fromisocalendar(end_year, 1, 1)
+        end_dt = datetime.fromisocalendar(end_year, 1, 1)
+
+        if len(dt_list) == 1:
+            start_dt = dt_list[0]
+            period_duration = end_dt - start_dt
+            return SinglePeriodTimeIndex(
+                start_time=start_dt,
+                period_duration=period_duration,
+                is_52_week_years=is_52_week_years,
+                extrapolate_first_point=extrapolate_first_point,
+                extrapolate_last_point=extrapolate_last_point,
+            )
+
         return ListTimeIndex(
-            datetime_list=[*dt_list, end_date],
+            datetime_list=[*dt_list, end_dt],
             is_52_week_years=is_52_week_years,
             extrapolate_first_point=extrapolate_first_point,
             extrapolate_last_point=extrapolate_last_point,
