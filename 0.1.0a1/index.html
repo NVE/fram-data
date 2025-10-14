@@ -401,15 +401,15 @@
 
 
 <h1 id="overview">Overview</h1>
-<p>FRAM data package is a part of <a href="https://nve.github.io/fram/" target="_blank">FRAM</a> modelling framework developed by <a href="https://www.nve.no/" target="_blank">the Norwegian Water Resources and Energy Directorate (NVE)</a>. The package is responsible for connection between the database and the FRAM core package. It contains NVEs implementation of the Populator() class that populates the core model by translating the data from NVEs database into generic components so that the data can be further manipulated and sent to the power market model. </p>
-<p><img alt="FRAM data" src="img/framdata.png" /></p>
+<p>FRAM data package is a part of <a href="https://nve.github.io/fram/" target="_blank">FRAM</a> modelling framework developed by <a href="https://www.nve.no/english/" target="_blank">the Norwegian Water Resources and Energy Directorate (NVE)</a>. The package is responsible for connection between the database and the FRAM core package. It contains NVEs implementation of the Populator() class that populates the core model by translating the data from NVEs database into generic components so that the data can be further manipulated and sent to the power market model. </p>
+<p><img alt="FRAM data" src="img/framdata.svg" /></p>
 <h2 id="installation">Installation</h2>
 <p>To install the data package, run <code>pip install fram-data</code>. But <strong>we recommend</strong>  that you rather start by installing our <a href="https://nve.github.io/fram-demo/" target="_blank">simple demo</a> to better understand how FRAM works.</p>
 <h2 id="nves-database">NVEs database</h2>
-<p>NVEs database is a folder with data files with folder structure, file format and table format defined by NVE. See <a href="https://nve.github.io/fram-dataset/" target="_blank">this database</a> for the example. NVEs database is model-neutral meaning that the same data can be used to build different energy market models.</p>
-<p>FRAM is designed so that different users can use their own databses with the format that suits them best.</p>
+<p>NVEs database is a folder with data files with folder structure, file format and table format defined by NVE. See <a href="https://zenodo.org/records/17294467" target="_blank">our demo database</a> as an example. NVEs database is model-neutral meaning that the same data can be used to build different energy market models.</p>
+<p>FRAM is designed so that different users can use their own databases with file and table formats that suit them best. Than they need their own populator. </p>
 <h2 id="nves-populator">NVEs populator</h2>
-<p>NVEs implementation of the populator supports file formats and table formats in NVEs database. Populator is implementes using the populator interface defined in FRAM core. </p>
+<p>NVEs implementation of the populator supports file formats and table formats in NVEs database. Populator must be implemented using the populator interface defined in <a href="https://nve.github.io/fram-core/" target="_blank">FRAM core</a>.</p>
 <p>If you want to use your own database together with FRAM, you should create your own implementation of the populator. Use this package as an example.</p>
 
 
