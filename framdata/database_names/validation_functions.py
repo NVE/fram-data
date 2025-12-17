@@ -8,34 +8,6 @@ from pandera.typing import Series
 
 from framdata.database_names._attribute_metadata_names import _AttributeMetadataNames
 
-"""
-Standard descriptions for validation checks that are commonly used in Pandera DataFrameModel schemas.
-
-The dictionary must adhere to the following structure:
-    - Key (str): The name of the validation check method. The name must be unique and match the name of a check method.
-    - Values (tuple[str, bool]):
-        - The first element (str) provides a concise and user-friendly description of the check. E.g. what
-            caused the validation error or what is required for the check to pass.
-        - The second element (bool) indicates whether the check is a warning (True) or an error (False).
-
-"""
-STANDARD_CHECK_DESCRIPTION = {
-    # Built-in pandera checks
-    "dtype('str')": ("Value must be of type str.", False),
-    "dtype('int')": ("Value must be of type int.", False),
-    "dtype('float')": ("Value must be of type float.", False),
-    "dtype('bool')": ("Value must be of type bool.", False),
-    "not_nullable": ("None values are not allowed.", False),
-    "field_uniqueness": ("Column values must be unique. Found duplicates.", False),
-    # Custom checks that are commonly used
-    "dtype_str_int_float": ("Value must be of type str, int or float.", False),
-    "dtype_str_int_float_none": ("Value must be of type str, int, float or None.", False),
-    "check_unit_is_str_for_attributes": ("Value must be of type str. Unit is required.", False),
-    "numeric_values_greater_than_or_equal_to_0": ("Value should be greater than or equal to 0.", True),
-    "numeric_values_less_than_or_equal_to_0": ("Value should be less than or equal to 0.", True),
-    "numeric_values_are_between_or_equal_to_0_and_1": ("Value should be between 0 and 1 or equal to 0 or 1.", True),
-}
-
 
 @extensions.register_check_method()
 def dtype_str_int_float(series: Series[Any]) -> Series[bool]:
@@ -84,6 +56,25 @@ def numeric_values_greater_than_or_equal_to(series: Series[Any], min_value: int 
         message = "min_value must be of type int or float."
         raise ValueError(message)
     return series.apply(lambda x: x >= min_value if isinstance(x, (int | float)) else True)
+
+
+@extensions.register_check_method()
+def numeric_values_greater_than(series: Series[Any], min_value: int | float) -> Series[bool]:
+    """
+    Check if values are greater than or equal to min_value if they are of type int or float.
+
+    Args:
+        series (Series[Any]): Series to check.
+        min_value (int | float): Value that the elements in the series should be greater than or equal.
+
+    Returns:
+        Series[bool]: Series of boolean values detonating if each element has passed the check.
+
+    """
+    if not isinstance(min_value, (int | float)):
+        message = "min_value must be of type int or float."
+        raise ValueError(message)
+    return series.apply(lambda x: x > min_value if isinstance(x, (int | float)) else True)
 
 
 @extensions.register_check_method()
@@ -169,3 +160,34 @@ def check_unit_is_str_for_attributes(df: pd.DataFrame, attribute_names: list[str
     is_attribute_rows = df[_AttributeMetadataNames.attribute].isin(attribute_names)
     unit_is_str = df[_AttributeMetadataNames.unit].apply(lambda x: isinstance(x, str))
     return ~is_attribute_rows | unit_is_str
+
+
+"""
+Standard descriptions for validation checks that are commonly used in Pandera DataFrameModel schemas.
+
+The dictionary must adhere to the following structure:
+    - Key (str): The name of the validation check method. The name must be unique and match the name of a check method.
+    - Values (tuple[str, bool]):
+        - The first element (str) provides a concise and user-friendly description of the check. E.g. what
+            caused the validation error or what is required for the check to pass.
+        - The second element (bool) indicates whether the check is a warning (True) or an error (False).
+
+"""
+STANDARD_CHECK_DESCRIPTION = {
+    # Built-in pandera checks
+    "dtype('str')": ("Value must be of type str.", False),
+    "dtype('int')": ("Value must be of type int.", False),
+    "dtype('float')": ("Value must be of type float.", False),
+    "dtype('bool')": ("Value must be of type bool.", False),
+    "not_nullable": ("Missing values are not allowed.", False),
+    "field_uniqueness": ("Column values must be unique. Found duplicates.", False),
+    # Custom checks that are commonly used. NB! Function names in the Schema classes in database_names (not the generic ones defined in this module) must match
+    # keys in this dictionary for descriptions to show up.
+    dtype_str_int_float.__name__: ("Value must be of type str, int or float.", False),
+    dtype_str_int_float_none.__name__: ("Value must be of type str, int, float or None.", False),
+    check_unit_is_str_for_attributes.__name__: ("Value must be of type str. Unit is required.", False),
+    numeric_values_greater_than_or_equal_to.__name__ + "_0": ("Value should be greater than or equal to 0.", True),
+    numeric_values_greater_than.__name__ + "_0": ("Value should be greater than 0.", True),
+    numeric_values_less_than_or_equal_to.__name__ + "_0": ("Value should be less than or equal to 0.", True),
+    numeric_values_are_between_or_equal_to.__name__ + "_0_and_1": ("Value should be between 0 and 1 or equal to 0 or 1.", True),
+}

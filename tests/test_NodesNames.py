@@ -7,7 +7,7 @@ from framdata.database_names.nodes_names import NodesNames
 
 @patch("framdata.database_names.nodes_names.Node", new_callable=MagicMock)
 def test_create_component(mock_node: MagicMock):
-    NodesNames._parse_args = MagicMock(return_value={"ExogenPrice": "300 EUR/MWh", "PriceProfile": "NO1_Profile"})
+    NodesNames._parse_args = MagicMock(return_value={"ExogenousPrice": "300 EUR/MWh", "PriceProfile": "NO1_Profile"})
     NodesNames._add_meta = MagicMock()
 
     mock_node_instance = MagicMock()
@@ -18,7 +18,7 @@ def test_create_component(mock_node: MagicMock):
         "NodeID": 0,
         "NiceName": 1,
         "Commodity": 2,
-        "ExogenPrice": 3,
+        "ExogenousPrice": 3,
         "PriceProfile": 4,
         "IsExogenous": 5,
         "MemberColumn": 6,
@@ -31,5 +31,5 @@ def test_create_component(mock_node: MagicMock):
     result = NodesNames.create_component(row, indices, meta_columns, meta_data)
     assert result == expected
     mock_node.assert_called_once()
-    NodesNames._parse_args.assert_called_once_with(row, indices, ["ExogenPrice", "PriceProfile"], meta_data)
+    NodesNames._parse_args.assert_called_once_with(row, indices, ["ExogenousPrice", "PriceProfile"], meta_data)
     NodesNames._add_meta.assert_called_once_with(mock_node_instance, row, indices, meta_columns)

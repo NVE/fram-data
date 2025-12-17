@@ -36,7 +36,6 @@ def test_metadata() -> dict:
         "NumberOfPoints": 5,
         "TimeZone": None,
         "Unit": None,
-        "Currency": None,
     }
 
 

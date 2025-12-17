@@ -3,9 +3,11 @@
 from datetime import datetime, timedelta, tzinfo
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
+from numpy.typing import NDArray
 
 from framdata.database_names.TimeVectorMetadataNames import TimeVectorMetadataNames as TvMn
 from framdata.file_editors.NVEFileEditor import NVEFileEditor
@@ -23,7 +25,7 @@ class NVEParquetTimeVectorEditor(NVEFileEditor):
 
         """
         super().__init__(source)
-        self._metadata, __ = ({}, None) if self._source is None or not self._source.exists() else self._read_metadata()
+        self._metadata = {} if self._source is None or not self._source.exists() else self._read_metadata()
         self._data = pd.DataFrame() if self._source is None or not self._source.exists() else pd.read_parquet(self._source)
 
     def save_to_parquet(self, path: Path | str) -> None:
@@ -44,20 +46,28 @@ class NVEParquetTimeVectorEditor(NVEFileEditor):
 
         pq.write_table(table, path)
 
-    def get_metadata(self):
-        """Get a copy of the metadata of the parquet file."""
-        return self._metadata if self._metadata is None else self._metadata.copy()
+    def get_metadata(self) -> dict:
+        """Get a copy of the metadata of the vectors in the parquet file."""
+        return self._metadata.copy()
 
-    def set_metadata(self, key: str, value: bool | int | str | datetime | timedelta | tzinfo | None) -> None:
+    def set_metadata(self, metadata: dict[str, TvMn.METADATA_TYPES]) -> None:
+        """Set the metadata dictionary (overwrites existing)."""
+        self._check_type(metadata, dict)
+        for key, value in metadata.items():
+            self._check_type(key, str)
+            self._check_type(value, TvMn.METADATA_TYPES_TUPLE)
+        self._metadata = metadata
+
+    def set_metadata_by_key(self, key: str, value: TvMn.METADATA_TYPES) -> None:
         """Set a field (new or overwrite) in the metadata."""
         self._check_type(key, str)
-        self._check_type(value, (bool, int, str, datetime, timedelta, tzinfo, type(None)))
+        self._check_type(value, TvMn.METADATA_TYPES_TUPLE)
         self._metadata[key] = value
 
-    def set_vector(self, vector_id: str, values: pd.Series) -> None:
+    def set_vector(self, vector_id: str, values: NDArray | pd.Series) -> None:
         """Set a whole vector in the time vector table."""
         self._check_type(vector_id, str)
-        self._check_type(values, pd.Series)
+        self._check_type(values, (np.ndarray, pd.Series))
         if not self._data.empty and len(values) != len(self._data):
             message = f"Series values has different size than the other vectors in the table.\nLength values: {len(values)}\nLength vectors: {len(self._data)}"
             raise IndexError(message)
@@ -84,9 +94,9 @@ class NVEParquetTimeVectorEditor(NVEFileEditor):
         """Get the IDs of all vectors."""
         return [c for c in self._data.columns if c != TvMn.DATETIME_COL]
 
-    def set_index_column(self, index: pd.Series) -> None:
+    def set_index_column(self, index: NDArray | pd.Series) -> None:
         """Set the index column."""
-        self._check_type(index, pd.Series)
+        self._check_type(index, (np.ndarray, pd.Series))
         if not self._data.empty and len(index) != len(self._data):
             message = f"Series index has different size than the other vectors in the table.\nLength index: {len(index)}\nLength vectors: {len(self._data)}"
             raise IndexError(message)
@@ -99,9 +109,11 @@ class NVEParquetTimeVectorEditor(NVEFileEditor):
             raise KeyError(message)
         return self._data[TvMn.DATETIME_COL].copy()
 
-    def _read_metadata(self) -> tuple[dict[str, bool | int | str | datetime | timedelta | tzinfo | None], set[str]]:
+    def _read_metadata(self) -> dict[str, bool | int | str | datetime | timedelta | tzinfo | None]:
         if self._source is None:
             message = "Must set a source before reading file."
             raise ValueError(message)
         metadata = pq.ParquetFile(self._source).schema_arrow.metadata
-        return TvMn.cast_meta(metadata)
+
+        cast_meta, __ = TvMn.cast_meta(metadata)  # ignore missing keys
+        return cast_meta

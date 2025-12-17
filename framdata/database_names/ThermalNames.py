@@ -1,6 +1,6 @@
 """Classes defining Thermal tables."""
 
-from typing import ClassVar
+from typing import Any, ClassVar
 
 import pandas as pd
 import pandera as pa
@@ -8,10 +8,17 @@ from framcore.attributes import Conversion, Cost, Efficiency, Hours, MaxFlowVolu
 from framcore.components import Thermal
 from framcore.metadata import Meta
 from numpy.typing import NDArray
+from pandera.typing import Series
 
 from framdata.database_names._attribute_metadata_names import _AttributeMetadataSchema
 from framdata.database_names._base_names import _BaseComponentsNames
 from framdata.database_names.nodes_names import FuelNodesNames
+from framdata.database_names.validation_functions import (
+    check_unit_is_str_for_attributes,
+    dtype_str_int_float,
+    dtype_str_int_float_none,
+    numeric_values_greater_than_or_equal_to,
+)
 
 
 class ThermalNames(_BaseComponentsNames):
@@ -222,10 +229,84 @@ class ThermalNames(_BaseComponentsNames):
 class ThermalSchema(pa.DataFrameModel):
     """Pandera DataFrameModel schema for attribute data in the Thermal.Generators file."""
 
-    pass
+    ThermalID: Series[str] = pa.Field(unique=True, nullable=False)
+    PowerNode: Series[str] = pa.Field(nullable=False)
+    FuelNode: Series[str] = pa.Field(nullable=False)
+    EmissionCoefficient: Series[Any] = pa.Field(nullable=True)
+    EmissionNode: Series[str] = pa.Field(nullable=True)
+    Capacity: Series[Any] = pa.Field(nullable=False)
+    FullLoadEfficiency: Series[Any] = pa.Field(nullable=True)
+    PartLoadEfficiency: Series[Any] = pa.Field(nullable=True)
+    VOC: Series[Any] = pa.Field(nullable=True)
+    StartCosts: Series[Any] = pa.Field(nullable=True)
+    StartHours: Series[Any] = pa.Field(nullable=True)
+    MinStableLoad: Series[Any] = pa.Field(nullable=True)
+    MinOperationalBound: Series[Any] = pa.Field(nullable=True)
+    MaxOperationalBound: Series[Any] = pa.Field(nullable=True)
+    RampUp: Series[Any] = pa.Field(nullable=True)
+    RampDown: Series[Any] = pa.Field(nullable=True)
+
+    @pa.check(ThermalNames.capacity_col)
+    @classmethod
+    def dtype_str_int_float(cls, series: Series[Any]) -> Series[bool]:
+        """Check if values in the series are of datatype: str, int or float."""
+        return dtype_str_int_float(series)
+
+    @pa.check(
+        ThermalNames.emission_coeff_col,
+        ThermalNames.full_load_col,
+        ThermalNames.part_load_col,
+        ThermalNames.voc_col,
+        ThermalNames.start_costs_col,
+        ThermalNames.start_hours_col,
+        ThermalNames.min_stable_load_col,
+        ThermalNames.max_op_bound_col,
+        ThermalNames.min_op_bound_col,
+        ThermalNames.ramp_up_col,
+        ThermalNames.ramp_down_col,
+    )
+    @classmethod
+    def dtype_str_int_float_none(cls, series: Series[Any]) -> Series[bool]:
+        """Check if values in the series are of datatype: str, int, float or None."""
+        return dtype_str_int_float_none(series)
+
+    @pa.check(
+        ThermalNames.capacity_col,
+        ThermalNames.full_load_col,
+        ThermalNames.part_load_col,
+        ThermalNames.voc_col,
+        ThermalNames.emission_coeff_col,
+    )
+    @classmethod
+    def numeric_values_greater_than_or_equal_to_0(cls, series: Series[Any]) -> Series[bool]:
+        """Check if numeric values in the series are greater than or equal to zero."""
+        return numeric_values_greater_than_or_equal_to(series, 0)
 
 
 class ThermalMetadataSchema(_AttributeMetadataSchema):
     """Pandera DataFrameModel schema for metadata in the Thermal.Generators file."""
 
-    pass
+    @pa.dataframe_check
+    @classmethod
+    def check_unit_is_str_for_attributes(cls, df: pd.DataFrame) -> Series[bool]:
+        """
+        Check that the 'unit' value is a string for the row where 'attribute' is 'Capacity'.
+
+        Args:
+            df (Dataframe): DataFrame used to check value for "unit".
+
+        Returns:
+            Series[bool]: Series of boolean values detonating if each element has passed the check.
+
+        """
+        return check_unit_is_str_for_attributes(
+            df,
+            [
+                ThermalNames.emission_coeff_col,
+                ThermalNames.capacity_col,
+                ThermalNames.voc_col,
+                ThermalNames.start_costs_col,
+                # ThermalNames.ramp_up_col, # ?
+                # ThermalNames.ramp_down_col, # ?
+            ],
+        )

@@ -1,6 +1,6 @@
 """Classes defining Wind and Solar tables and how to create Components from them."""
 
-from typing import ClassVar
+from typing import Any, ClassVar
 
 import pandas as pd
 import pandera as pa
@@ -8,26 +8,24 @@ from framcore.attributes import MaxFlowVolume
 from framcore.components import Solar, Wind
 from framcore.metadata import Meta
 from numpy.typing import NDArray
+from pandera.typing import Series
 
 from framdata.database_names._attribute_metadata_names import _AttributeMetadataSchema
 from framdata.database_names._base_names import _BaseComponentsNames
+from framdata.database_names.validation_functions import (
+    check_unit_is_str_for_attributes,
+    dtype_str_int_float,
+    dtype_str_int_float_none,
+)
 
 
 class WindSolarNames(_BaseComponentsNames):
     """Class representing the names and structure of Wind and Solar tables."""
 
-    id_col = "ID"
     power_node_col = "PowerNode"
     profile_col = "Profile"
     type_col = "TechnologyType"
     capacity_col = "Capacity"
-
-    columns: ClassVar[list[str]] = [
-        id_col,
-        power_node_col,
-        profile_col,
-        capacity_col,
-    ]
 
     ref_columns: ClassVar[list[str]] = [
         power_node_col,
@@ -92,17 +90,54 @@ class WindSolarNames(_BaseComponentsNames):
 class WindSolarSchema(pa.DataFrameModel):
     """Standard Pandera DataFrameModel schema for attribute data in the Wind and Solar files."""
 
-    pass
+    ID: Series[str] = pa.Field(unique=True, nullable=False)
+    Capacity: Series[Any] = pa.Field(nullable=False)
+    PowerNode: Series[str] = pa.Field(nullable=False)
+    Profile: Series[Any] = pa.Field(nullable=True)
+
+    @pa.check(WindSolarNames.capacity_col)
+    @classmethod
+    def dtype_str_int_float(cls, series: Series[Any]) -> Series[bool]:
+        """Check if values in the series are of datatype: str, int or float."""
+        return dtype_str_int_float(series)
+
+    @pa.check(WindSolarNames.profile_col)
+    @classmethod
+    def dtype_str_int_float_none(cls, series: Series[Any]) -> Series[bool]:
+        """Check if values in the series are of datatype: str, int, float or None."""
+        return dtype_str_int_float_none(series)
 
 
 class WindSolarMetadataSchema(_AttributeMetadataSchema):
     """Standard Pandera DataFrameModel schema for metadata in the Wind and Solar files."""
 
-    pass
+    @pa.dataframe_check
+    @classmethod
+    def check_unit_is_str_for_attributes(cls, df: pd.DataFrame) -> Series[bool]:
+        """
+        Check that the 'unit' value is a string for the row where 'attribute' is 'Capacity'.
+
+        Args:
+            df (Dataframe): DataFrame used to check value for "unit".
+
+        Returns:
+            Series[bool]: Series of boolean values detonating if each element has passed the check.
+
+        """
+        return check_unit_is_str_for_attributes(df, [WindSolarNames.capacity_col])
 
 
 class WindNames(WindSolarNames):
     """Class representing the names and structure of Wind tables, and method for creating Wind Component objects."""
+
+    id_col = "WindID"
+
+    columns: ClassVar[list[str]] = [
+        id_col,
+        WindSolarNames.power_node_col,
+        WindSolarNames.profile_col,
+        WindSolarNames.capacity_col,
+    ]
 
     @staticmethod
     def create_component(
@@ -148,6 +183,15 @@ class WindNames(WindSolarNames):
 
 class SolarNames(WindSolarNames):
     """Class representing the names and structure of Solar tables, and method for creating Solar Component objects."""
+
+    id_col = "SolarID"
+
+    columns: ClassVar[list[str]] = [
+        id_col,
+        WindSolarNames.power_node_col,
+        WindSolarNames.profile_col,
+        WindSolarNames.capacity_col,
+    ]
 
     @staticmethod
     def create_component(

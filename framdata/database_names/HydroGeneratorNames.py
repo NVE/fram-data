@@ -84,7 +84,7 @@ class HydroGeneratorNames(_BaseComponentsNames):
 
         generator = HydroGenerator(
             power_node=row[indices[HydroGeneratorNames.node_col]],
-            energy_eq=Conversion(level=arg_user_code[HydroGeneratorNames.en_eq_col]),
+            energy_equivalent=Conversion(level=arg_user_code[HydroGeneratorNames.en_eq_col]),
             pq_curve=arg_user_code[HydroGeneratorNames.pq_curve_col],
             tailwater_elevation=arg_user_code[HydroGeneratorNames.tailw_elev_col],
             nominal_head=arg_user_code[HydroGeneratorNames.head_nom_col],

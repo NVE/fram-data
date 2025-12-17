@@ -97,7 +97,7 @@ class HydroPumpNames(_BaseComponentsNames):
             from_module=row[indices[HydroPumpNames.pump_from_col]],
             to_module=row[indices[HydroPumpNames.pump_to_col]],
             water_capacity=MaxFlowVolume(level=arg_user_code[HydroPumpNames.vol_capacity_col]),
-            energy_eq=Conversion(level=arg_user_code[HydroPumpNames.energy_equiv_col]),
+            energy_equivalent=Conversion(level=arg_user_code[HydroPumpNames.energy_equiv_col]),
             power_capacity=MaxFlowVolume(level=arg_user_code[HydroPumpNames.power_capacity_col]),
             head_max=arg_user_code[HydroPumpNames.h_max_col],
             head_min=arg_user_code[HydroPumpNames.h_min_col],

@@ -32,7 +32,7 @@ def test_create_component(mock_wind: MagicMock):
     )
     # the columns for the row above (mapping columns to array)
     indices = {
-        "ID": 0,
+        "WindID": 0,
         "Capacity": 1,
         "PowerNode": 2,
         "Profile": 3,

@@ -43,7 +43,9 @@ class TimeVectorMetadataNames:
     TIMEZONE = "TimeZone"
 
     UNIT = "Unit"
-    CURRENCY = "Currency"
+
+    METADATA_TYPES = bool | int | str | datetime | timedelta | tzinfo | None
+    METADATA_TYPES_TUPLE = (bool, int, str, datetime, timedelta, tzinfo, type(None))
 
     # reference_period = "ReferencePeriod"
 
@@ -63,7 +65,6 @@ class TimeVectorMetadataNames:
     B_NUM_POINTS = NUM_POINTS.encode(ENCODING)
     B_TIMEZONE = TIMEZONE.encode(ENCODING)
     B_UNIT = UNIT.encode(ENCODING)
-    B_CURRENCY = CURRENCY.encode(ENCODING)
 
     str_keys_to_bytes_map: ClassVar[dict[str, bytes]] = {
         ID_COLUMN_NAME: B_ID_COLUMN_NAME,
@@ -79,7 +80,6 @@ class TimeVectorMetadataNames:
         NUM_POINTS: B_NUM_POINTS,
         TIMEZONE: B_TIMEZONE,
         UNIT: B_UNIT,
-        CURRENCY: B_CURRENCY,
     }
 
     strict_bools_cast: ClassVar[set[str]] = {
@@ -98,7 +98,6 @@ class TimeVectorMetadataNames:
         NUM_POINTS: int,
         TIMEZONE: pytz.timezone,
         UNIT: str,
-        CURRENCY: str,
     }
 
     @staticmethod

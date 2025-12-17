@@ -27,20 +27,20 @@ class DatabaseNames(Base):
 
     # ---------- DATABASE FOLDERs MAP ---------- #
     db00 = "db00_nodes"
-    db01 = "db01_nodes_profiles"
-    db10 = "db10_wind_solar"
-    db11 = "db11_wind_solar_profiles"
-    db20 = "db20_hydropower"
-    db21 = "db21_hydropower_profiles"
-    db22 = "db22_hydropower_curves"
-    db30 = "db30_thermal"
-    db31 = "db31_thermal_profiles"
-    db40 = "db40_demand"
-    db41 = "db41_demand_profiles"
-    db50 = "db50_transmission"
-    db51 = "db51_transmission_profiles"
+    db01 = "db01_nodes_time_vectors"
+    db10 = "db10_wind"
+    db20 = "db20_solar"
+    db30 = "db30_hydropower"
+    db31 = "db31_hydropower_time_vectors"
+    db32 = "db32_hydropower_curves"
+    db40 = "db40_thermal"
+    # db41 = "db41_thermal_time_vectors"
+    db50 = "db50_demand"
+    # db51 = "db51_demand_time_vectors"
+    db60 = "db60_transmission"
+    # db61 = "db61_transmission_time_vectors"
 
-    db_folder_list: ClassVar[list] = [db00, db01, db10, db11, db20, db21, db22, db30, db31, db40, db41, db50, db51]
+    db_folder_list: ClassVar[list] = [db00, db01, db10, db20, db30, db31, db32, db40, db50, db60]
 
     # ---------- FILENAMES ---------- #
     # ==== NODES ====
@@ -94,10 +94,12 @@ class DatabaseNames(Base):
     demand_consumers_profiles_weatheryears = "Demand.Consumers.profiles.weatheryears"
     demand_consumers_profiles_oneyear = "Demand.Consumers.profiles"
 
-    # ==== WIND AND SOLAR ====
+    # ==== WIND ====
     wind_generators = "Wind.Generators"
     wind_generators_capacity = "Wind.Generators.capacity"
     wind_generators_profiles = "Wind.Generators.profiles"
+
+    # ==== SOLAR ====
     solar_generators = "Solar.Generators"
     solar_generators_capacity = "Solar.Generators.capacity"
     solar_generators_profiles = "Solar.Generators.profiles"
@@ -122,49 +124,50 @@ class DatabaseNames(Base):
         emission_nodes_profiles: db01,
         # ===: HYDROPOWER ====,
         # hydro attribute tables
-        hydro_modules: db20,
-        hydro_modules_volumecapacity: db20,
-        hydro_modules_enekv_global_derived: db20,
-        hydro_modules_reggrad_glob_derived: db20,
-        hydro_modules_reggrad_lok_derived: db20,
-        hydro_bypass: db20,
-        hydro_generators: db20,
-        hydro_inflow: db20,
-        hydro_inflow_yearvolume: db20,
-        hydro_inflow_upstream_inflow_derived: db20,
-        hydro_pumps: db20,
-        hydro_reservoirs: db20,
+        hydro_modules: db30,
+        hydro_modules_volumecapacity: db30,
+        hydro_modules_enekv_global_derived: db30,
+        hydro_modules_reggrad_glob_derived: db30,
+        hydro_modules_reggrad_lok_derived: db30,
+        hydro_bypass: db30,
+        hydro_generators: db30,
+        hydro_inflow: db30,
+        hydro_inflow_yearvolume: db30,
+        hydro_inflow_upstream_inflow_derived: db30,
+        hydro_pumps: db30,
+        hydro_reservoirs: db30,
         # hydro time series
-        hydro_inflow_profiles: db21,
-        hydro_bypass_operationalbounds_restrictions: db21,
-        hydro_modules_operationalbounds_restrictions: db21,
-        hydro_reservoirs_operationalbounds_restrictions: db21,
-        hydro_generators_energyeq_mid: db21,
+        hydro_inflow_profiles: db31,
+        hydro_bypass_operationalbounds_restrictions: db31,
+        hydro_modules_operationalbounds_restrictions: db31,
+        hydro_reservoirs_operationalbounds_restrictions: db31,
+        hydro_generators_energyeq_mid: db31,
         # hydro curves
-        hydro_curves: db22,
-        hydro_pqcurves: db22,
-        # ===: THERMAL ====,
-        thermal_generators: db30,
-        thermal_generators_capacity: db30,
-        thermal_generators_profiles: db31,
-        # ===: DEMAND ====,
-        demand_consumers: db40,
-        demand_consumers_capacity: db40,
-        demand_consumers_normalprices: db40,
-        demand_consumers_profiles_weatheryears: db41,
-        demand_consumers_profiles_oneyear: db41,
-        # ===: WIND AND SOLAR ====,
+        hydro_curves: db32,
+        hydro_pqcurves: db32,
+        # ==== THERMAL ====,
+        thermal_generators: db40,
+        thermal_generators_capacity: db40,
+        thermal_generators_profiles: db40,
+        # ==== DEMAND ====,
+        demand_consumers: db50,
+        demand_consumers_capacity: db50,
+        demand_consumers_normalprices: db50,
+        demand_consumers_profiles_weatheryears: db50,
+        demand_consumers_profiles_oneyear: db50,
+        # ==== WIND ====,
         wind_generators: db10,
-        wind_generators_capacity: db11,
-        wind_generators_profiles: db11,
-        solar_generators: db10,
-        solar_generators_capacity: db11,
-        solar_generators_profiles: db11,
+        wind_generators_capacity: db10,
+        wind_generators_profiles: db10,
+        # ==== SOLAR ====
+        solar_generators: db20,
+        solar_generators_capacity: db20,
+        solar_generators_profiles: db20,
         # ==== Transmission ====
-        transmission_grid: db50,
-        transmission_capacity: db51,
-        transmission_loss: db51,
-        transmission_profiles: db51,
+        transmission_grid: db60,
+        transmission_capacity: db60,
+        transmission_loss: db60,
+        transmission_profiles: db60,
     }
 
     @classmethod

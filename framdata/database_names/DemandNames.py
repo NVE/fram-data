@@ -165,7 +165,7 @@ class DemandNames(_BaseComponentsNames):
 
         """
         return {
-            "check_elastic_demand": ("Missing elastic demand value.", True),
+            DemandSchema.check_elastic_demand.__name__: ("Missing elastic demand value.", True),
         }
 
     @staticmethod
@@ -187,9 +187,9 @@ class DemandNames(_BaseComponentsNames):
             pd.DataFrame: The updated error DataFrame with formatted rows for unique validation checks.
 
         """
-        if "check_elastic_demand" in errors[DemandNames.COL_CHECK].to_numpy():
-            check_rows = errors.loc[errors[DemandNames.COL_CHECK] == "check_elastic_demand"]
-            errors = errors[~(errors[DemandNames.COL_CHECK] == "check_elastic_demand")]
+        if DemandSchema.check_elastic_demand.__name__ in errors[DemandNames.COL_CHECK].to_numpy():
+            check_rows = errors.loc[errors[DemandNames.COL_CHECK] == DemandSchema.check_elastic_demand.__name__]
+            errors = errors[~(errors[DemandNames.COL_CHECK] == DemandSchema.check_elastic_demand.__name__)]
             elastic_demand_columns = [
                 DemandNames.price_elasticity_col,
                 DemandNames.min_price_col,
@@ -205,7 +205,7 @@ class DemandNames(_BaseComponentsNames):
                         elastic_demand_rows.append(
                             [
                                 col,
-                                "check_elastic_demand",
+                                DemandSchema.check_elastic_demand.__name__,
                                 None,
                                 idx,
                                 check_description_str,
