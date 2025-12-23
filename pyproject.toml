@@ -1,6 +1,6 @@
 [project]
 name = "fram-data"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = [
     {name = "The Norwegian Water Resources and Energy Directorate", email = "fram@nve.no"}
@@ -9,6 +9,7 @@ license = "LICENSE.md"
 readme = "README.md"
 requires-python = ">=3.11,<4"
 dependencies = [
+    "numpy (>=2.2.2,<2.4.0)",
     "fram-core (>=0.1.0)",
     "pandas (>=2.2.3)",
     "pyarrow",
